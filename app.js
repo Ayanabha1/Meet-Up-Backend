@@ -124,7 +124,7 @@ io.on("connection", (socket) => {
     socket.to(data?.to).emit("receive-candidate", data);
   });
 
-  socket.on("disconnecting", () => {
+  socket.once("disconnect", () => {
     let targetRoom;
     let participantDetails;
     rooms.forEach((room) => {
@@ -141,10 +141,12 @@ io.on("connection", (socket) => {
     console.log(
       participantDetails?.name + " user disconnected " + targetRoom?.roomId
     );
-    console.log(targetRoom);
-    socket.broadcast.to(targetRoom?.roomId).emit("user-disconnected", {
-      disconnectedUser: participantDetails,
-      currentSessionParticipants: targetRoom?.currentSessionParticipants,
+    console.log(
+      targetRoom.currentSessionParticipants
+    );
+    io.sockets.in(targetRoom?.roomId).emit("user-disconnected", {
+      disconnectedUser : participantDetails,
+      currentSessionParticipants : targetRoom.currentSessionParticipants
     });
   });
 });
